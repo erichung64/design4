@@ -1,39 +1,34 @@
-from flask import Flask, send_file, jsonify, request
+from flask import Flask, render_template, send_from_directory, jsonify
 import pandas as pd
-from wordcloud import WordCloud
 import os
 
 app = Flask(__name__)
-df = pd.read_csv('Drake.csv')  # Make sure to use your actual CSV path here
 
-# Function to generate a word cloud image
-def generate_word_cloud(lyrics):
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(lyrics)
-    image_path = '/mnt/data/wordcloud.png'
-    wordcloud.to_file(image_path)
-    return image_path
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-# Route to get the word cloud for a specific song title
-@app.route('/wordcloud', methods=['GET'])
-def serve_word_cloud():
-    song_title = request.args.get('song', '')
-    if song_title:
-        # Select lyrics for the song
-        lyrics_data = df.loc[df['Title'].str.lower() == song_title.lower(), 'Lyric']
-        if not lyrics_data.empty:
-            lyrics = lyrics_data.iloc[0]
-            image_path = generate_word_cloud(lyrics)
-            return send_file(image_path, mimetype='image/png')
-        else:
-            return jsonify({"error": "Song not found"}), 404
-    else:
-        return jsonify({"error": "No song title provided"}), 400
+@app.route('/styles.css')
+def styles():
+    return send_from_directory('static', 'styles.css')
 
-# Route to get a list of all song titles
-@app.route('/songs', methods=['GET'])
-def list_songs():
-    songs = df['Title'].dropna().unique().tolist()
-    return jsonify(songs)
+@app.route('/script.js')
+def script():
+    return send_from_directory('static', 'script.js')
+
+@app.route('/data.csv')
+def get_data():
+    # Assuming you have already merged your data into a single data.csv file
+    # in the root directory of your Flask application.
+    # If it's generated dynamically, you would merge it here instead.
+    return send_from_directory('.', 'data.csv')
+
+@app.route('/api/lyrics', methods=['GET'])
+def get_lyrics():
+    # This is a placeholder for any API endpoint you might want to implement
+    # for fetching data dynamically via AJAX calls from your front-end
+    # For example, to filter data based on user input without reloading the page.
+    pass
 
 if __name__ == '__main__':
     app.run(debug=True)
