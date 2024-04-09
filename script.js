@@ -1,17 +1,24 @@
 stopwords = new Set("i,me,my,myself,we,us,our,ours,ourselves,you,your,yours,yourself,yourselves,he,him,his,himself,she,her,hers,herself,it,its,itself,they,them,their,theirs,themselves,what,which,who,whom,whose,this,that,these,those,am,is,are,was,were,be,been,being,have,has,had,having,do,does,did,doing,will,would,should,can,could,ought,i'm,you're,he's,she's,it's,we're,they're,i've,you've,we've,they've,i'd,you'd,he'd,she'd,we'd,they'd,i'll,you'll,he'll,she'll,we'll,they'll,isn't,aren't,wasn't,weren't,hasn't,haven't,hadn't,doesn't,don't,didn't,won't,wouldn't,shan't,shouldn't,can't,cannot,couldn't,mustn't,let's,that's,who's,what's,here's,there's,when's,where's,why's,how's,a,an,the,and,but,if,or,because,as,until,while,of,at,by,for,with,about,against,between,into,through,during,before,after,above,below,to,from,up,upon,down,in,out,on,off,over,under,again,further,then,once,here,there,when,where,why,how,all,any,both,each,few,more,most,other,some,such,no,nor,not,only,own,same,so,than,too,very,say,says,said,shall".split(","))
 
 let saved_data;
+let artist_state;
+let start_year_state;
+let end_year_state;
 
 d3.csv('data.csv').then(data => {
     saved_data = data;
-    PopulateDropdown()
-    Filtered(data, 'Ariana Grande');
+    PopulateDropdowns()
+    Filtered(data, artist_state, start_year_state, end_year_state);
 });
 
-function PopulateDropdown() {
-    const select = d3.select("select");
+function PopulateDropdowns() {
+    const art_select = d3.select("#artist");
+    const start_year_select = d3.select("#s_year");
+    const end_year_select = d3.select("#e_year");
     let artists = [];
+    let years = [];
     
+    // Extract artists and years
     for (let i = 0; i < saved_data.length; i++) {
         let included = false;
         for (let j = 0; j < artists.length; j++) {
@@ -23,24 +30,71 @@ function PopulateDropdown() {
         if (!included) {
             artists.push(saved_data[i].Artist);
         }
-    }
 
-    console.log(artists);
-    select.selectAll("option")
+        included = false;
+        for (let j = 0; j < years.length; j++) {
+            if (years[j] == saved_data[i].Year.slice(0, 4)) {
+                included = true;
+                break;
+            }
+        }
+        if (!included) {
+            let year_clipped = saved_data[i].Year.slice(0, 4);
+            if (!isNaN(year_clipped) && Number(year_clipped) < 2025 && Number(year_clipped) > 1900) {
+                years.push(saved_data[i].Year);
+            }
+            
+        }
+    }
+    years = years.sort();
+    years = ["All"].concat(years);
+
+    // Initialize states
+    artist_state = artists[0];
+    start_year_state = years[0];
+    end_year_state = years[0];
+
+    // Create dropdown options
+    art_select.selectAll("option")
         .data(artists)
         .join("option")
-            .attr("label", city => city)
+            .attr("label", artist => artist);
+    
+    start_year_select.selectAll("option")
+        .data(years)
+        .join("option")
+            .attr("label", year => year);
 
-    select.on("change", changeEvent => {
-        Filtered(saved_data, artists[changeEvent.target.selectedIndex]);
-        // drawChart(changeEvent.target.selectedIndex); // The newly selected index
+    end_year_select.selectAll("option")
+        .data(years)
+        .join("option")
+            .attr("label", year => year);
+
+    // Implement changing values
+    art_select.on("change", changeEvent => {
+        artist_state = artists[changeEvent.target.selectedIndex];
+        Filtered(saved_data, artist_state, start_year_state, end_year_state);
     });
+
+    start_year_select.on("change", changeEvent => {
+        start_year_state = years[changeEvent.target.selectedIndex];
+        Filtered(saved_data, artist_state, start_year_state, end_year_state);
+    });
+
+    end_year_select.on("change", changeEvent => {
+        end_year_state = years[changeEvent.target.selectedIndex];
+        Filtered(saved_data, artist_state, start_year_state, end_year_state);
+    })
 }
 
-function Filtered(data, artist, year="all") {
+function Filtered(data, artist, start_year, end_year) {
     let lyrics = [];
     for (let i = 0; i < data.length; i++) {
-        if (data[i].Artist === artist) {
+        const artist_data = data[i].Artist;
+        const year_data = data[i].Year.slice(0, 4);
+        if (artist_data === artist
+                && ((start_year === "All") || (!isNaN(year_data) && Number(year_data) >= Number(start_year)))
+                && ((end_year === "All") || (!isNaN(year_data) && Number(year_data) <= Number(end_year)))) {
             lyrics.push(data[i].Lyric);
         }
     }
@@ -56,9 +110,6 @@ function Filtered(data, artist, year="all") {
             .map(w => w.toLowerCase())
             .filter(w => w && !stopwords.has(w) && w.length > 2))
     }
-
-    console.log(words);
-    console.log(artist);
 
     WordCloud(words, {
         width: 1500,
