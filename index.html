@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Word Cloud Viewer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+    <!-- <script type="module" src="d3.layout.cloud.js"></script> -->
+    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Word Cloud Viewer</h1>
-    <img id="wordCloudImage" src="" alt="Word Cloud">
+    <select name="cars" id="cars"></select>
+    <div id="my_dataviz"></div>
     <script src="script.js"></script>
 </body>
 </html>
