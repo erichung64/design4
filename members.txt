@@ -1,0 +1,2 @@
+Michal Juscinski: Word cloud
+Eric Chung: Small multiples, server
