@@ -99,7 +99,7 @@ function generateWordCloud(container, wordsData, { width = 640, height = 400, fo
 
     // Dynamic min and max font sizes
     const minFontSize = 10; // Minimum font size
-    const maxFontSize = 60; // Maximum font size
+    const maxFontSize = 100; // Maximum font size
 
     // Logarithmic scale for font sizes
     const fontSizeScale = d3.scaleLog()
@@ -122,7 +122,7 @@ function generateWordCloud(container, wordsData, { width = 640, height = 400, fo
     const cloud = d3.layout.cloud()
         .size([width, height])
         .words(data)
-        .padding(5) // Adjust padding as needed
+        .padding(2) // Adjust padding as needed
         .rotate(() => (~~(Math.random() * 6) - 3) * 30) // Random rotation for variety
         .font("sans-serif")
         .fontSize(d => fontSizeScale(d.size)) // Use the dynamic font size based on our scale
