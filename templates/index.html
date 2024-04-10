@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Word Cloud Viewer</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
-    <!-- <script type="module" src="d3.layout.cloud.js"></script> -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-cloud/build/d3.layout.cloud.js"></script>    
     <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <select name="artist" id="artist"></select>
-    <select name="s_year" id="s_year"></select>
-    <select name="e_year" id="e_year"></select>
-    <div id="my_dataviz"></div>
+    <div id="wordCloudsContainer"></div>
+    <button id="addWordCloud">Add Word Cloud</button>
     <script src="script.js"></script>
 </body>
 </html>
